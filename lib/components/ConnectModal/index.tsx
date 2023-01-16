@@ -1,7 +1,3 @@
-import CloseDefault from "@mui/icons-material/Close";
-import MailOutlineIconDefault from "@mui/icons-material/MailOutline";
-import { providers } from "ethers";
-import React, { useEffect, useState } from "react";
 import {
   BraveIcon,
   ButtonPrimary,
@@ -14,97 +10,68 @@ import {
   Text,
   TwitterIcon,
   WalletConnectIcon,
-} from "../.";
-import { useFocusTrap, useWeb3 } from "../../utils";
+} from "@klimadao/lib/components";
+import { useModal } from "@klimadao/lib/providers";
+import { useFocusTrap, useWeb3 } from "@klimadao/lib/utils";
+import { Trans } from "@lingui/react";
+import CloseDefault from "@mui/icons-material/Close";
+import MailOutlineIconDefault from "@mui/icons-material/MailOutline";
+import React, { useEffect, useState } from "react";
+import { WEB3_MODAL_CONSTANTS } from "./constants";
 import * as styles from "./styles";
 
-// ems modules and javascript are strange so we import like this
-const Close = (CloseDefault as any).default as any;
-const MailOutlineIcon = (MailOutlineIconDefault as any).default as any;
-export interface ConnectModalProps {
-  errorMessage: string;
-  torusText: string;
-  titles: {
-    connect: string;
-    loading: string;
-    error: string;
-  };
-  buttonClassName?: string;
-  onClose?: () => void;
-  showModal: boolean;
-}
+type WalletType = "coinbase" | "torus" | "walletConnect" | "metamask" | "brave";
 
-type WindowEthereum = providers.ExternalProvider & {
-  isBraveWallet: boolean;
-  isCoinbaseWallet: boolean;
-};
-
-export const ConnectModal = (props: ConnectModalProps) => {
+export const ConnectModal = (props: {
+  step?: "connect" | "error" | "loading";
+}) => {
   const [step, setStep] = useState<"connect" | "error" | "loading">("connect");
-  const { connect, toggleModal } = useWeb3();
   const focusTrapRef = useFocusTrap();
-  const [eth, setEth] = useState<WindowEthereum | undefined>(undefined);
+  const { connect } = useWeb3();
+  const [showMetamask, setShowMetamask] = useState(false);
+  const [showBrave, setShowBrave] = useState(false);
+  const { closeModal } = useModal();
+  const title = WEB3_MODAL_CONSTANTS.titles[step];
 
   useEffect(() => {
-    if (window) setEth((window as any).ethereum as WindowEthereum);
+    if (window.ethereum && (window.ethereum as any).isBraveWallet) {
+      setShowBrave(true);
+    } else if (window.ethereum) {
+      setShowMetamask(true);
+    }
   }, []);
 
-  const showBrave = eth?.isBraveWallet;
-  const showMetamask = eth?.isMetaMask;
-  const showCoinbaseWallet = eth?.isCoinbaseWallet;
-
-  const getTitle = (step: "connect" | "error" | "loading") =>
-    !props.titles ? "loading" : props.titles[step];
-  useEffect(() => {
-    if (props.showModal) {
-      setStep("connect");
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-  }, [props.showModal]);
-  const handleConnect = async (params: {
-    wallet: "coinbase" | "torus" | "walletConnect" | "injected";
-  }) => {
+  /** Connect to the appropriate wallet */
+  const handleConnect = async (params: { wallet: WalletType }) => {
     try {
       if (!params.wallet) return;
       setStep("loading");
-      if (params.wallet === "injected" && connect) {
-        await connect("injected");
-      } else if (params.wallet === "coinbase" && connect) {
-        await connect("coinbase");
-      } else if (params.wallet === "walletConnect" && connect) {
-        await connect("walletConnect");
-      } else if (params.wallet === "torus" && connect) {
-        await connect("torus");
-      }
-      toggleModal();
-      setStep("connect");
-      props.onClose?.();
-    } catch (e: any) {
+      await connect?.(params.wallet);
+      closeModal();
+    } catch (e) {
       console.error(e);
       setStep("error");
     }
   };
-  if (!props.showModal) return null;
+
   return (
     <div aria-modal={true}>
-      <div className={styles.modalBackground} onClick={() => toggleModal()} />
+      <div className={styles.modalBackground} onClick={closeModal} />
       <div className={styles.modalContainer}>
         <div className={styles.modalContent} ref={focusTrapRef}>
           <span className="title">
-            <Text t="h4">{getTitle(step)}</Text>
-            <button onClick={() => toggleModal()}>
-              <Close fontSize="large" />
+            <Text t="h4">{title}</Text>
+            <button onClick={closeModal}>
+              <CloseDefault fontSize="large" />
             </button>
           </span>
-          {step === "connect" && (
+          {props.step === "connect" && (
             <>
               <div className={styles.buttonsContainer}>
                 {showMetamask && (
                   <span
                     className={styles.walletButton}
-                    onClick={() => handleConnect({ wallet: "injected" })}
+                    onClick={() => handleConnect({ wallet: "metamask" })}
                   >
                     <MetaMaskFoxIcon />
                     <Text t="button">Metamask</Text>
@@ -113,7 +80,7 @@ export const ConnectModal = (props: ConnectModalProps) => {
                 {showBrave && (
                   <span
                     className={styles.walletButton}
-                    onClick={() => handleConnect({ wallet: "injected" })}
+                    onClick={() => handleConnect({ wallet: "metamask" })}
                   >
                     <BraveIcon />
                     <Text t="button">Brave</Text>
@@ -121,11 +88,7 @@ export const ConnectModal = (props: ConnectModalProps) => {
                 )}
                 <span
                   className={styles.walletButton}
-                  onClick={() =>
-                    handleConnect({
-                      wallet: showCoinbaseWallet ? "injected" : "coinbase",
-                    })
-                  }
+                  onClick={() => handleConnect({ wallet: "coinbase" })}
                 >
                   <CoinbaseWalletIcon />
                   <Text t="button">Coinbase</Text>
@@ -141,7 +104,7 @@ export const ConnectModal = (props: ConnectModalProps) => {
               <span className={styles.continueBox}>
                 <div className={styles.leftLine} />
                 <Text className={styles.continueText} t="badge">
-                  {props.torusText}
+                  <Trans id="connectModal.continue">or continue with</Trans>
                 </Text>
                 <div className={styles.rightLine} />
               </span>
@@ -162,19 +125,23 @@ export const ConnectModal = (props: ConnectModalProps) => {
                   <DiscordColorIcon className={styles.discord} />
                 </span>
                 <span className={styles.buttonBackground}>
-                  <MailOutlineIcon fontSize="large" />
+                  <MailOutlineIconDefault fontSize="large" />
                 </span>
               </div>
             </>
           )}
-          {step === "loading" && (
+          {props.step === "loading" && (
             <div className={styles.spinner}>
               <Spinner />
             </div>
           )}
-          {step === "error" && (
+          {props.step === "error" && (
             <div className={styles.errorContent}>
-              <Text t="body2">{props.errorMessage}</Text>
+              <Text t="body2">
+                <Trans id="connect_modal.error_message">
+                  We had some trouble connecting. Please try again.
+                </Trans>
+              </Text>
               <ButtonPrimary label="OK" onClick={() => setStep("connect")} />
             </div>
           )}
@@ -183,3 +150,5 @@ export const ConnectModal = (props: ConnectModalProps) => {
     </div>
   );
 };
+
+export { useConnectModal } from "./useConnectModal";

@@ -1,13 +1,12 @@
-import { t, Trans } from "@lingui/macro";
-import Payment from "@mui/icons-material/Payment";
-import { providers } from "ethers";
-
 import { Anchor, ButtonPrimary, Text } from "@klimadao/lib/components";
 import { urls } from "@klimadao/lib/constants";
-import { useWeb3 } from "@klimadao/lib/utils";
+import { useModal } from "@klimadao/lib/providers";
+import { t, Trans } from "@lingui/macro";
 import LoginIcon from "@mui/icons-material/Login";
+import Payment from "@mui/icons-material/Payment";
 import { BalancesCard } from "components/BalancesCard";
 import { ImageCard } from "components/ImageCard";
+import { providers } from "ethers";
 import * as styles from "./styles";
 
 interface Props {
@@ -17,7 +16,7 @@ interface Props {
 }
 
 export const Buy = (props: Props) => {
-  const { toggleModal } = useWeb3();
+  const { openModal } = useModal();
   return (
     <>
       <div className={styles.buyCard}>

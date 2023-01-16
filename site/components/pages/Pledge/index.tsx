@@ -1,4 +1,4 @@
-import { ButtonPrimary, Text } from "@klimadao/lib/components";
+import { ButtonPrimary, Text, useConnectModal } from "@klimadao/lib/components";
 import { t } from "@lingui/macro";
 import { utils } from "ethers";
 import { getIsDomainInURL } from "lib/getIsDomainInURL";
@@ -37,7 +37,8 @@ export const Pledge: NextPage = () => {
     setSubmitting(false);
   };
 
-  const { address, toggleModal, renderModal } = useWeb3();
+  const { address } = useWeb3();
+  const toggleModal = useConnectModal();
 
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
@@ -68,31 +69,6 @@ export const Pledge: NextPage = () => {
             "Demonstrate your commitment to climate positivity by claiming your pledge dashboard to highlight all of your carbon offsetting activity",
         })}
       />
-      {renderModal &&
-        renderModal({
-          errorMessage: t({
-            message: "We had some trouble connecting. Please try again.",
-            id: "connect_modal.error_message",
-          }),
-          torusText: t({
-            message: "or continue with",
-            id: "connectModal.continue",
-          }),
-          titles: {
-            connect: t({
-              id: "connect_modal.sign_in",
-              message: "Sign In / Connect",
-            }),
-            loading: t({
-              id: "connect_modal.connecting",
-              message: "Connecting...",
-            }),
-            error: t({
-              id: "connect_modal.error_title",
-              message: "Connection Error",
-            }),
-          },
-        })}
       <div className={styles.pageContainer}>
         <div className={styles.headerContainer}>
           <Navigation activePage="Pledges" />
@@ -380,7 +356,6 @@ export const Pledge: NextPage = () => {
             </div>
           </section>
         </div>
-
         <Footer transparent />
       </div>
     </>

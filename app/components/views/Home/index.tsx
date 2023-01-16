@@ -23,7 +23,7 @@ import { Wrap } from "components/views/Wrap";
 
 import { initLocale } from "lib/i18n";
 
-import { ButtonPrimary } from "@klimadao/lib/components";
+import { ButtonPrimary, useConnectModal } from "@klimadao/lib/components";
 import { concatAddress, getStaticProvider, useWeb3 } from "@klimadao/lib/utils";
 import { t } from "@lingui/macro";
 import Menu from "@mui/icons-material/Menu";
@@ -48,15 +48,9 @@ export const Home: FC = () => {
 
   const { locale } = useSelector(selectAppState);
 
-  const {
-    address,
-    isConnected,
-    disconnect,
-    toggleModal,
-    network,
-    provider,
-    renderModal,
-  } = useWeb3();
+  const { address, isConnected, disconnect, network, provider } = useWeb3();
+
+  const toggleModal = useConnectModal();
 
   useEffect(() => {
     if (locale === undefined) {
@@ -164,30 +158,6 @@ export const Home: FC = () => {
                 onClick={disconnect}
               />
             )}
-            {renderModal({
-              errorMessage: t({
-                message: "We had some trouble connecting. Please try again.",
-                id: "connect_modal.error_message",
-              }),
-              torusText: t({
-                message: "or continue with",
-                id: "connectModal.continue",
-              }),
-              titles: {
-                connect: t({
-                  id: "connect_modal.sign_in",
-                  message: "Sign In / Connect",
-                }),
-                loading: t({
-                  id: "connect_modal.connecting",
-                  message: "Connecting...",
-                }),
-                error: t({
-                  id: "connect_modal.error_title",
-                  message: "Connection Error",
-                }),
-              },
-            })}
           </div>
           <IsomorphicRoutes>
             <Route

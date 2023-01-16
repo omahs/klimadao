@@ -35,6 +35,7 @@
   },
   "exports": {
     "./components": "./out/components/index.js",
+    "./providers": "./out/providers/index.js",
     "./constants": "./out/constants/index.js",
     "./featureFlags": "./out/featureFlags/index.js",
     "./utils": "./out/utils/index.js",

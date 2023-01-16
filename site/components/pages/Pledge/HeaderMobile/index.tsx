@@ -1,4 +1,8 @@
-import { ButtonPrimary, KlimaInfinityLogoOnly } from "@klimadao/lib/components";
+import {
+  ButtonPrimary,
+  KlimaInfinityLogoOnly,
+  useConnectModal,
+} from "@klimadao/lib/components";
 import { t } from "@lingui/macro";
 import dynamic from "next/dynamic";
 import { FC } from "react";
@@ -19,7 +23,8 @@ interface Props {
 }
 
 export const HeaderMobile: FC<Props> = (props) => {
-  const { address, isConnected, toggleModal, disconnect } = useWeb3();
+  const { address, isConnected, disconnect } = useWeb3();
+  const toggleModal = useConnectModal();
   return (
     <div className={styles.headerMobileWrap}>
       <header className={styles.headerMobile}>
