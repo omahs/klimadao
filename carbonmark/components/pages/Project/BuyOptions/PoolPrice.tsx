@@ -6,6 +6,7 @@ import { Card } from "components/Card";
 import { Text } from "components/Text";
 import { createRedeemLink, createRetireLink } from "lib/createUrls";
 import { formatToPrice, formatToTonnes } from "lib/formatNumbers";
+import { LO } from "lib/luckyOrange";
 import { PriceFlagged, Project } from "lib/types/carbonmark";
 import { FC } from "react";
 import * as styles from "./styles";
@@ -40,15 +41,16 @@ export const PoolPrice: FC<Props> = (props) => {
       <div className={styles.buttons}>
         <ButtonPrimary
           label={t`Buy`}
+          onClick={() => LO.track("Purchase: Buy Clicked")}
           href={createRedeemLink({
             projectTokenAddress: props.project.projectAddress,
             poolName: props.price.name.toLowerCase(),
           })}
           renderLink={(linkProps) => <Anchor {...linkProps} />}
         />
-
         <CarbonmarkButton
           label={t`Retire now`}
+          onClick={() => LO.track("Retire: Retire Button Clicked")}
           href={createRetireLink({
             retirementToken: props.price.name.toLowerCase(),
             projectTokens: props.project.projectAddress,

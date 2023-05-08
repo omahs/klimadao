@@ -10,6 +10,7 @@ import { Text } from "components/Text";
 import { Vintage } from "components/Vintage";
 import { createProjectLink, createRetireLink } from "lib/createUrls";
 import { formatToTonnes } from "lib/formatNumbers";
+import { LO } from "lib/luckyOrange";
 import { AssetForListing } from "lib/types/carbonmark";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -26,7 +27,6 @@ export const AssetProject: FC<Props> = (props) => {
   const retireLink = createRetireLink({
     retirementToken: props.asset.tokenAddress,
   });
-
   return (
     <Card>
       {props.asset.project && (
@@ -65,6 +65,7 @@ export const AssetProject: FC<Props> = (props) => {
           label={<Trans>Retire</Trans>}
           href={retireLink}
           renderLink={(linkProps) => <Anchor {...linkProps} />}
+          onClick={() => LO.track("Retire: Retire Button Clicked")}
         />
         <CarbonmarkButton label={<Trans>Sell</Trans>} onClick={props.onSell} />
       </div>
