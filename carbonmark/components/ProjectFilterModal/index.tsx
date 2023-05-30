@@ -39,7 +39,7 @@ type SortOption = keyof typeof PROJECT_SORT_OPTIONS;
 export const ProjectFilterModal: FC<ProjectFilterModalProps> = (props) => {
   const router = useRouter();
 
-  const { projects } = useFetchProjects();
+  const { projects, isValidating } = useFetchProjects();
 
   // Set the default values and override with any existing url params
   const defaultValues = { ...DEFAULTS, ...router.query };
@@ -97,7 +97,7 @@ export const ProjectFilterModal: FC<ProjectFilterModalProps> = (props) => {
       { shallow: true } // don't refetch props nor reload page
     );
     // Close the modal on submit
-    props.onToggleModal?.();
+    // props.onToggleModal?.();
   };
 
   const getAccordionSubtitle = (index: number) => {
@@ -145,7 +145,12 @@ export const ProjectFilterModal: FC<ProjectFilterModalProps> = (props) => {
             control={control}
           />
         </Accordion>
-        <ButtonPrimary className="action" label={t`Apply`} type="submit" />
+        <ButtonPrimary
+          className="action"
+          label={t`Apply`}
+          type="submit"
+          disabled={isValidating}
+        />
         <ButtonSecondary
           variant="transparent"
           className="action"
@@ -154,7 +159,9 @@ export const ProjectFilterModal: FC<ProjectFilterModalProps> = (props) => {
           onClick={() => reset(omit(DEFAULTS, "sort"))}
         />
         <Text t="h5" align="center">
-          {projects.length} Results
+          {!isValidating
+            ? `${projects.length} Results`
+            : t`Compiling Results ...`}
         </Text>
       </form>
     </Modal>

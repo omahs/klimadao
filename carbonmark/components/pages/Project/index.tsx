@@ -183,7 +183,6 @@ const Page: NextPage<PageProps> = (props) => {
         >
           {project.location && (
             <div className="mapColumn">
-               
               <ProjectMap
                 lat={project.location?.geometry.coordinates[1]}
                 lng={project.location?.geometry.coordinates[0]}
