@@ -32,7 +32,9 @@ const DEFAULTS: ModalFieldValues = {
   vintage: [],
 };
 
-type ProjectFilterModalProps = Omit<ModalProps, "title" | "children">;
+type ProjectFilterModalProps = Omit<ModalProps, "title" | "children"> & {
+  selectedFilters: (data: Array<Array<string>>) => void;
+};
 
 type SortOption = keyof typeof PROJECT_SORT_OPTIONS;
 
@@ -96,8 +98,10 @@ export const ProjectFilterModal: FC<ProjectFilterModalProps> = (props) => {
       undefined,
       { shallow: true } // don't refetch props nor reload page
     );
-    // Close the modal on submit
-    // props.onToggleModal?.();
+    if (!isValidating) {
+      props.onToggleModal?.();
+      props.selectedFilters(watchers);
+    }
   };
 
   const getAccordionSubtitle = (index: number) => {
